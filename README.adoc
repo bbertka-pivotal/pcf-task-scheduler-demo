@@ -1,0 +1,73 @@
+= CF Task Scheduler Demo - Create New BOSH Env
+This repositiory is a demo showing the functionality of CF tasks.  Its intended audience is for an Ops team or anyone with a CF deployment wanting to efficiently deploy multiple BOSH environments.  
+
+Note the architecture of this application is a simple link:https://pypi.python.org/pypi/python-cfworker[Python-CFWorker] server running in CF, with a Shell script used as the task.
+
+Disclaimer: This repo is not a substitute for a properly designed tool, however could be utilized as a starting point.
+
+== Requirements
+. PCF or CF running on AWS
+. Subnet in the PCF VPC not currently being used for PCF Runtime (e.g. pcf_public_subnet)
+
+== Prepare AWS Account
+. In necessary, follow instructions from BOSH.IO: link:https://bosh.io/docs/init-aws.html#prepare-aws[(Step1 - Prepare AWS Account)]
+. Double check you have a *bosh security group* as outlined above
+
+== Deploy to Cloud Foundry
+. Update the Manifest with some default parameters
++
+----
+$ cat manifest.yml
+
+applications:
+- name: bosh-create
+  memory: 128M
+  buildpack: python_buildpack
+  env:
+    director_name: bosh1
+    internal_cidr: 10.0.0.0/24
+    internal_gw: 10.0.0.1
+    internal_ip: 10.0.0.6
+    access_key_id: ZXCKI76698SD4OA
+    secret_access_key: Eoivxsdsdlb+59FZfHOiM
+    region: us-west-2
+    az: us-west-2a
+    default_key_name: pcfkey
+    default_security_group: bosh
+    private_key: pcf.pem
+    subnet_id: subnet-ff12348
+----
+. CF Push the Bosh_Create application
++
+----
+$ cf push -f manifest.yml
+----
+
+== Schedule a CF Task
+Schedule the creation of a BOSH env by running the CF Run-Task command while overiding the default parameters for *director_name* and *internal_ip*. You may do this by passing the values as arguments to the *create_env.sh* script. See the script to understand how this is performed.
+----
+$ cf run-task bosh_create /home/vcap/app/create_env.sh bosh2 10.0.0.6
+----
+
+== View Running and Completed Tasks
+. See the logs of a current task
++
+----
+$ cf logs bosh_create
+----
+
+. See the status of tasks
++
+----
+$ cf tasks bosh_create
+----
+
+== Congratulations you are now a PCF Task Master!
+
+Check out the official docs for more info: link:https://docs.pivotal.io/pivotalcf/1-11/devguide/using-tasks.html[Using Tasks on PCF]
+
+Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
+
+
+
+

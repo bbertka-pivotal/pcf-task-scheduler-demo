@@ -1,0 +1,18 @@
+---
+applications:
+- name: bosh-create
+  memory: 128M
+  buildpack: python_buildpack
+  env: 
+    director_name: bosh1
+    internal_cidr: 10.0.0.0/24
+    internal_gw: 10.0.0.1
+    internal_ip: 10.0.0.6
+    access_key_id: AKIA22ADSJFSDKASDA
+    secret_access_key: EoivxwnadsasHOiM
+    region: us-west-2
+    az: us-west-2a
+    default_key_name: pcf
+    default_security_group: bosh
+    private_key: pcf.pem
+    subnet_id: subnet-ff5sd8
