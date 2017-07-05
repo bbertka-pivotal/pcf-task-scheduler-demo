@@ -37,7 +37,7 @@ applications:
     private_key: pcf.pem
     subnet_id: subnet-ff12348
 ----
-. CF Push the Bosh_Create application
+. CF Push the Bosh-Create application
 +
 ----
 $ cf push -f manifest.yml
@@ -46,20 +46,20 @@ $ cf push -f manifest.yml
 == Schedule a CF Task
 Schedule the creation of a BOSH env by running the CF Run-Task command while overiding the default parameters for *director_name* and *internal_ip*. You may do this by passing the values as arguments to the *create_env.sh* script. See the script to understand how this is performed.
 ----
-$ cf run-task bosh_create /home/vcap/app/create_env.sh bosh2 10.0.0.6
+$ cf run-task bosh-create /home/vcap/app/create_env.sh bosh2 10.0.0.6
 ----
 
 == View Running and Completed Tasks
 . See the logs of a current task
 +
 ----
-$ cf logs bosh_create
+$ cf logs bosh-create
 ----
 
 . See the status of tasks
 +
 ----
-$ cf tasks bosh_create
+$ cf tasks bosh-create
 ----
 
 == Congratulations you are now a PCF Task Master!
