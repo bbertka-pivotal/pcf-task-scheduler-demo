@@ -6,12 +6,12 @@ Note the architecture of this application is a simple link:https://pypi.python.o
 Disclaimer: This repo is not a substitute for a properly designed tool, however could be utilized as a starting point.
 
 == Requirements
-. PCF or CF running on AWS
-. Subnet in the PCF VPC not currently being used for PCF Runtime (e.g. pcf_public_subnet)
+* PCF or CF running on AWS
+* Subnet in the PCF VPC not currently being used for PCF Runtime (e.g. pcf_public_subnet2)
 
 == Prepare AWS Account
-. In necessary, follow instructions from BOSH.IO: link:https://bosh.io/docs/init-aws.html#prepare-aws[(Step1 - Prepare AWS Account)]
-. Double check you have a *bosh security group* as outlined above
+* If necessary, follow instructions from BOSH.IO: link:https://bosh.io/docs/init-aws.html#prepare-aws[(Step1 - Prepare AWS Account)]
+* Double check you have a *bosh security group* as outlined above
 
 == Deploy to Cloud Foundry
 . Update the Manifest with some default parameters
