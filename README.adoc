@@ -14,7 +14,7 @@ Disclaimer: This repo is not a substitute for a properly designed tool, however 
 * Double check you have a *bosh security group* as outlined above
 
 == Deploy to Cloud Foundry
-. Update the Manifest with some default parameters
+. Update the Manifest with some default parameters including your RSA private key
 +
 ----
 $ cat manifest.yml
@@ -32,10 +32,20 @@ applications:
     secret_access_key: Eoivxsdsdlb+59FZfHOiM
     region: us-west-2
     az: us-west-2a
-    default_key_name: pcfkey
+    default_key_name: boshprivatekey
     default_security_group: bosh
-    private_key: pcf.pem
     subnet_id: subnet-ff12348
+    private_key_value: "-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+3cHqzUynS5a437DjHJjq1HN4hcSwSeSUYOilUnTzhrZMfbXNQmw7IxEXabxPSFU/iCo=
+-----END RSA PRIVATE KEY-----"
+
 ----
 . CF Push the Bosh-Create application
 +

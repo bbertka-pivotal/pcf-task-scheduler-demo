@@ -3,6 +3,9 @@
 export director_name=$1
 export internal_ip=$2
 
+echo ${private_key_value} > /home/vcap/app/keystring.txt
+sed "s/-----BEGIN RSA PRIVATE KEY-----//" keystring.txt | sed "s/-----END RSA PRIVATE KEY-----//" | tr ' ' '\n' | sed '1 s/^.*$/-----BEGIN RSA PRIVATE KEY-----/' | sed '$ s/^.*$/-----END RSA PRIVATE KEY-----/' > /home/vcap/app/${default_key_name}.pem
+
 echo "Getting latest BOSH CLI v2"
 wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.26-linux-amd64 -P /home/vcap/app -O bosh2
 sleep 5
@@ -28,5 +31,5 @@ echo "Creating new BOSH Environment"
     -v az=${az} \
     -v default_key_name=${default_key_name} \
     -v default_security_groups=[${default_security_group}] \
-    --var-file private_key=/home/vcap/app/${private_key} \
-    -v subnet_id=${subnet_id}  && echo "Done deploying new BOSH!" && cat /home/vcap/app/creds.yml | grep password
+    --var-file private_key=/home/vcap/app/${default_key_name}.pem \
+    -v subnet_id=${subnet_id}  && echo "Done deploying new BOSH!" && cat /home/vcap/app/creds.yml | grep password 

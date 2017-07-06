@@ -3,16 +3,26 @@ applications:
 - name: bosh-create
   memory: 128M
   buildpack: python_buildpack
-  env: 
+  env:
     director_name: bosh1
     internal_cidr: 10.0.0.0/24
     internal_gw: 10.0.0.1
     internal_ip: 10.0.0.6
-    access_key_id: AKIA22ADSJFSDKASDA
-    secret_access_key: EoivxwnadsasHOiM
+    access_key_id: ZXCKI76698SD4OA
+    secret_access_key: Eoivxsdsdlb+59FZfHOiM
     region: us-west-2
     az: us-west-2a
-    default_key_name: pcf
+    default_key_name: boshprivatekey
     default_security_group: bosh
-    private_key: pcf.pem
-    subnet_id: subnet-ff5sd8
+    subnet_id: subnet-ff12348
+    private_key_value: "-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+MIIEogIBAAKCAQEAsBhgMTdQwAtQNSCJ+9IUs10vqvBuceYVHDDXD/hXMDRiNujauR1eSH1sjpYZ
+3cHqzUynS5a437DjHJjq1HN4hcSwSeSUYOilUnTzhrZMfbXNQmw7IxEXabxPSFU/iCo=
+-----END RSA PRIVATE KEY-----"
+
