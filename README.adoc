@@ -54,27 +54,76 @@ $ cf run-task bosh-create /home/vcap/app/create_env.sh bosh2 10.0.0.6
 +
 ----
 $ cf logs bosh-create
+
+...
+...
+2017-07-06T12:48:28.382-07:00 [APP/TASK/create-env/0] [ERR] 2017-07-06 19:48:28 (4.22 MB/s) - 'bosh2' saved [19598478/19598478]
+2017-07-06T12:48:33.383-07:00 [APP/TASK/create-env/0] [OUT] Setting proper permissions on Bosh CLI
+2017-07-06T12:48:33.385-07:00 [APP/TASK/create-env/0] [ERR] Cloning into 'bosh-deployment'...
+2017-07-06T12:48:33.874-07:00 [APP/TASK/create-env/0] [OUT] Done cloning bosh-deployment
+2017-07-06T12:48:34.943-07:00 [APP/PROC/WEB/0] [OUT] Task server is running
+2017-07-06T12:48:38.875-07:00 [APP/TASK/create-env/0] [OUT] Creating new BOSH Environment
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT Done deploying new BOSH!
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT admin_password: p5r345tgVF1260vr
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT blobstore_agent_password: wdqgFkz6v5Jd4f4VX
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT blobstore_director_password: e0x1dx7890jr
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT hm_password: g1l1dj73ix1fp
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT mbus_bootstrap_password: qs3fqz50wpi6t
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT nats_password: uw0d37dhrn1l6jv
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT postgres_password: k138fnrh5pdFGR3di
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT registry_password: 9ikh545FGt8H7umv
+2017-07-06T12:56:29.90-0700 [APP/TASK/create-env/0]OUT Exit status 0
+2017-07-06T12:56:29.92-0700 [APP/TASK/create-env/0]OUT Destroying container
+2017-07-06T12:56:30.38-0700 [APP/TASK/create-env/0]OUT Successfully destroyed container
+
 ----
 
 . See the status of tasks
 +
 ----
 $ cf tasks bosh-create
+
+Getting tasks for app bosh-create in org Team Awesome / space development as bbertka...
+OK
+
+id   name         state       start time                      command
+1    create-env   SUCCEEDED   Thu, 06 Jul 2017 19:48:21 UTC   /home/vcap/app/create_env.sh bosh2 10.0.0.6
 ----
 
-== Congratulations you are now a PCF Task Master!
-
-Check out the official docs for more info: link:https://docs.pivotal.io/pivotalcf/1-11/devguide/using-tasks.html[Using Tasks on PCF]
-
-Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
-
-== Further Exploration
+== Using your new BOSH
 . Target your BOSH (within VPC)
 +
 ----
-$ bosh target 10.0.0.6
-Username: admin
-Password: 
+ubuntu@ip-10-0-0-70:~$ bosh target 10.0.0.6
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Target set to 'bosh2'
+ubuntu@ip-10-0-0-70:~$ bosh login
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Your username: admin
+Enter password:
+Logged in as 'admin'
+----
++
+----
+ubuntu@ip-10-0-0-70:~$ bosh status
+Config
+             /home/ubuntu/.bosh_config
+
+Director
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+  Name       bosh2
+  URL        https://10.0.0.6:25555
+  Version    262.3.0 (00000000)
+  User       admin
+  UUID       a904c750-4868-4f85-a1bb-7182842402f3
+  CPI        aws_cpi
+  dns        disabled
+  compiled_package_cache disabled
+  snapshots  disabled
+  config_server disabled
+
+Deployment
+  not set
 ----
 
 . Connect to your BOSH instance via SSH (within VPC)
@@ -82,3 +131,9 @@ Password:
 ----
 $ ssh -i pcf.pem vcap@10.0.0.6
 ----
+
+== Congratulations you are now a PCF Task Master!
+
+Check out the official docs for more info: link:https://docs.pivotal.io/pivotalcf/1-11/devguide/using-tasks.html[Using Tasks on PCF]
+
+Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
