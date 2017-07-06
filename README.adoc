@@ -97,6 +97,9 @@ id   name         state       start time                      command
 ubuntu@ip-10-0-0-70:~$ bosh target 10.0.0.6
 RSA 1024 bit CA certificates are loaded due to old openssl compatibility
 Target set to 'bosh2'
+----
++
+----
 ubuntu@ip-10-0-0-70:~$ bosh login
 RSA 1024 bit CA certificates are loaded due to old openssl compatibility
 Your username: admin
