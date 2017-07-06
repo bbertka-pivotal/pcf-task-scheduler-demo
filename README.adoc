@@ -69,13 +69,7 @@ Check out the official docs for more info: link:https://docs.pivotal.io/pivotalc
 Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
 
 == Further Exploration
-. Connect to your BOSH instance at your public DNS name as 'vcap' user
-+
-----
-$ ssh -i pcf.pem vcap@ec2-12-32-163-80.us-west-2.compute.amazonaws.com
-----
-
-. Target your BOSH (within VPC, your IP might vary)
+. Target your BOSH (within VPC)
 +
 ----
 $ bosh target 10.0.0.6
@@ -83,3 +77,8 @@ Username: admin
 Password: 
 ----
 
+. Connect to your BOSH instance via SSH (within VPC)
++
+----
+$ ssh -i pcf.pem vcap@10.0.0.6
+----
