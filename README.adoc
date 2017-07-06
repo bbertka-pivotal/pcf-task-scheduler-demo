@@ -75,6 +75,11 @@ Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check i
 $ ssh -i pcf.pem vcap@ec2-12-32-163-80.us-west-2.compute.amazonaws.com
 ----
 
-. Target your BOSH (within VPC)
-
+. Target your BOSH (within VPC, your IP might vary)
++
+----
+$ bosh target 10.0.0.6
+Username: admin
+Password: 
+----
 

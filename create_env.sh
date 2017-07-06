@@ -29,4 +29,4 @@ echo "Creating new BOSH Environment"
     -v default_key_name=${default_key_name} \
     -v default_security_groups=[${default_security_group}] \
     --var-file private_key=/home/vcap/app/${private_key} \
-    -v subnet_id=${subnet_id}
+    -v subnet_id=${subnet_id}  && echo "Done deploying new BOSH!" && cat /home/vcap/app/creds.yml | grep password
