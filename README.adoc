@@ -152,4 +152,4 @@ Check out the official docs for more info: link:https://docs.pivotal.io/pivotalc
 Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
 
 
-= Next Lab - link:./concourse.adoc[Deploy Concourse]
+= Next Lab - link:./concourse-lab/concourse.adoc[Deploy Concourse]
