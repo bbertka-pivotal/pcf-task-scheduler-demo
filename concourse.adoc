@@ -81,7 +81,7 @@ Target set to 'bosh0'
 $ bosh cloud-config > bosh2-cloud-config.yml
 ----
 
-. Update *bosh2-cloud-config.yml* AZ and Network entries
+. Update *bosh2-cloud-config.yml* AZ and Network entries as in link:./bosh2-cloud-config.yml[Sample Bosh2 Manifest]
 +
 ----
 azs:
