@@ -150,3 +150,6 @@ $ ssh -i pcf.pem vcap@10.0.0.6
 Check out the official docs for more info: link:https://docs.pivotal.io/pivotalcf/1-11/devguide/using-tasks.html[Using Tasks on PCF]
 
 Note, versions of PCF 1.11 allow CF Task control via Apps Manager GUI -- check it out!
+
+
+== Next Lab - link:./concourse.adoc[Deploy Concourse]

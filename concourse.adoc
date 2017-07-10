@@ -1,0 +1,288 @@
+= Deploy Concourse
+Now that you have a BOSH running, its time to use it for something useful. This module will help you deploy a Bosh Managed Concourse cluster to AWS.
+
+Disclaimer: This repo is not a substitute for a properly designed tool, however could be utilized as a starting point.
+
+== Requirements
+* SSL cert and keys for Concourse Web Portal
+* AWS Elastic Load Balancer configured for Concourse and SSL
+* AWS Route53 CName for Concouse ELB
+* Configured Bosh Cloud Config
+* Concourse BOSH Release and Deployment Manifest
+
+== Generate Concourse SSL Cert and Keys
+We will be accessing the Concourse portal though an AWS load balancer, so will need some keys.
+. Update the included openssl.cnf file with your Route53 Domain names (eg. *.yourdomain.com, *.concourse.yourdomain.com)
++
+----
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+
+[req_distinguished_name]
+countryName = Country Name (2 letter code)
+countryName_default = US
+stateOrProvinceName = State or Province Name (full name)
+stateOrProvinceName_default = WA
+localityName = Locality Name (eg, city)
+localityName_default = Seattle
+organizationalUnitName  = Organizational Unit Name (eg, section)
+organizationalUnitName_default  = Company Organization Unit
+commonName = *.yourdomain.com
+commonName_max  = 64
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = *.concourse.yourdomain.com
+----
+
+. Generate Concourse TLS cert and keys
++
+----
+openssl genrsa -out concourse.pem 2048
+openssl req -sha256 -new -key concourse.pem -out csr.pem -config openssl.cnf
+openssl x509 -req -days 365 -in csr.pem -signkey concourse.pem -out concourse-certificate.pem
+openssl rsa -in concourse -outform PEM
+aws iam upload-server-certificate --server-certificate-name concourse-server-certificate --certificate-body file://concourse-certificate.pem --private-key file://concourse.pem
+aws iam get-server-certificate --server-certificate-name concourse-server-certificate
+----
+
+. Verify AWS upload of Cert 
++
+----
+$ aws iam get-server-certificate --server-certificate-name concourse-server-certificate
+{
+    "ServerCertificate": {
+        "CertificateBody": "-----BEGIN CERTIFICATE-----\nMIIDEjCCAfoCCQDFYXvpOvGahjANBgkqhkiGfCYgMHLP2Nkg==\n-----END CERTIFICATE-----",
+        "ServerCertificateMetadata": {
+            "ServerCertificateId": "AWEDJNGHRUFKDN232342346",
+            "ServerCertificateName": "concourse-server-certificate",
+            "Expiration": "2018-07-10T17:31:00Z",
+            "Path": "/",
+            "Arn": "arn:aws:iam::27046474656:server-certificate/concourse-server-certificate",
+            "UploadDate": "2017-07-10T17:45:51Z"
+        }
+    }
+}
+
+== Create an AWS Load Balancer for Concourse
+. Create Classic Load balancer as "concourse-elb"
+. Forward following ports
++
+----
+80   -> 8080
+443  -> 4443
+2222 -> 2222
+----
+. Attach your previously uploded *concourse-server-certificate* to the SSL port 443 of _concourse-elb_
+. Create a Route53 entry for *concourse.yourdomain.com* and set CName to DNS of _concourse-elb_
+
+== Update Bosh Cloud Config for Concourse
+. Target your BOSH (within VPC)
++
+----
+ubuntu@ip-10-0-0-70:~$ bosh target 10.0.0.6
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Target set to 'bosh2'
+----
++
+----
+ubuntu@ip-10-0-0-70:~$ bosh login
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Your username: admin
+Enter password:
+Logged in as 'admin'
+----
++
+----
+ubuntu@ip-10-0-0-70:~$ bosh status
+Config
+             /home/ubuntu/.bosh_config
+
+Director
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+  Name       bosh2
+  URL        https://10.0.0.6:25555
+  Version    262.3.0 (00000000)
+  User       admin
+  UUID       a904c750-4868-4f85-a1bb-7182842402f3
+  CPI        aws_cpi
+  dns        disabled
+  compiled_package_cache disabled
+  snapshots  disabled
+  config_server disabled
+
+Deployment
+  not set
+----
+
+. Target your original PCF Bosh Director and output Bosh Cloud Config 
++
+----
+$ bosh target 10.0.10.1
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Target set to 'bosh0'
+
+$ bosh cloud-config > bosh2-cloud-config.yml
+----
+
+. Update *bosh2-cloud-config.yml* AZ and Network entries
++
+----
+azs:
+- name: us-west-2a
+  cloud_properties:
+    availability_zone: us-west-2a
+networks:
+- name: boshnet
+  type: manual
+  subnets:
+  - dns:
+    - 10.0.0.2
+    range: 10.0.0.0/24
+    gateway: 10.0.0.1
+    azs:
+    - us-west-2a
+    cloud_properties:
+      subnet: subnet-ff593498
+    reserved:
+    - 10.0.0.2-10.0.0.10
+    - 10.0.0.62-10.0.0.254
+    static:
+    - 10.0.0.15
+    - 10.0.0.16
+    - 10.0.0.17
+    - 10.0.0.18
+----
+
+. Update *bosh2-cloud-config.yml* Compilation workers for the new network
++
+----
+compilation:
+  workers: 5
+  network: boshnet
+  az: us-west-2a
+  reuse_compilation_vms: true
+  vm_type: c4.xlarge
+  vm_extensions: []
+----
+
+. Replace *bosh2-cloud-config.yml* VM Extensions with Concourse specific values, including AWS Load Balancer
++
+----
+vm_extensions:
+- name: public_ip
+  cloud_properties:
+    auto_assign_public_ip: true
+- name: vm-extension-concourse-worker
+  cloud_properties:
+    elbs:
+    - concourse-elb
+    ephemeral_disk:
+      size: 32768
+----
+
+. Update your Bosh2 Cloud Config using *bosh2-cloud-config.yml*
++
+----
+$ bosh target 10.0.0.6
+RSA 1024 bit CA certificates are loaded due to old openssl compatibility
+Target set to 'bosh2'
+
+$ bosh update cloud-config bosh2-cloud-config.yml
+----
+
+== Create a Concourse BOSH Deployment 
+. Upload Ubuntu Stemcell
++
+----
+$ bosh upload stemcell https://s3.amazonaws.com/bosh-aws-light-stemcells/light-bosh-stemcell-3421.11-aws-xen-hvm-ubuntu-trusty-go_agent.tgz --sha1 SHA1
+
+$ bosh stemcells
+Acting as user 'admin' on 'bosh2'
+
++-----------------------------------------+---------------+----------+--------------------+
+| Name                                    | OS            | Version  | CID                |
++-----------------------------------------+---------------+----------+--------------------+
+| bosh-aws-xen-hvm-ubuntu-trusty-go_agent | ubuntu-trusty | 3421.11* | ami-92abbdeb light |
++-----------------------------------------+---------------+----------+--------------------+
+
+(*) Currently in-use
+
+Stemcells total: 1
+----
+
+. Upload Garden Run-C and Concourse Bosh releases
++
+----
+$ bosh upload release https://github.com/concourse/concourse/releases/download/v3.3.0/concourse-3.3.0.tgz
+$ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-runc-release
+
+$ bosh releases
+Acting as user 'admin' on 'bosh2'
+
++-------------+----------+-------------+
+| Name        | Versions | Commit Hash |
++-------------+----------+-------------+
+| concourse   | 3.3.0*   | 53ad989     |
+| garden-runc | 1.0.0*   | 33181c87    |
++-------------+----------+-------------+
+(*) Currently deployed
+
+Releases total: 2
+----
+
+. Create Concourse Bosh Manifest by updating values in sample Concourse manifest
+
+. Deploy Concourse
++
+----
+$ bosh deployment concourse.yml
+$ bosh deploy
+
+Deploying
+Are you sure you want to deploy? (type 'yes' to continue): yes
+
+Director task 31
+  Started preparing deployment > Preparing deployment. Done (00:00:00)
+
+  Started preparing package compilation > Finding packages to compile. Done (00:00:00)
+
+  Started creating missing vms
+  Started creating missing vms > web/54c3d07f-3c8e-4415-85c3-0fc2e603debc (0)
+  Started creating missing vms > db/557cbc56-0007-4739-9df8-a23e6190af7c (0)
+  Started creating missing vms > worker/608e5e3f-3a5a-4427-a313-aff44bea6447 (0). Done (00:01:14)
+     Done creating missing vms > db/557cbc56-0007-4739-9df8-a23e6190af7c (0) (00:01:14)
+     Done creating missing vms > web/54c3d07f-3c8e-4415-85c3-0fc2e603debc (0) (00:01:22)
+     Done creating missing vms (00:01:22)
+
+  Started updating instance worker > worker/608e5e3f-3a5a-4427-a313-aff44bea6447 (0) (canary)
+  Started updating instance db > db/557cbc56-0007-4739-9df8-a23e6190af7c (0) (canary)
+  Started updating instance web > web/54c3d07f-3c8e-4415-85c3-0fc2e603debc (0) (canary). Done (00:00:19)
+     Done updating instance worker > worker/608e5e3f-3a5a-4427-a313-aff44bea6447 (0) (canary) (00:00:35)
+     Done updating instance db > db/557cbc56-0007-4739-9df8-a23e6190af7c (0) (canary) (00:00:46)
+
+Task 31 done
+
+Started        2017-07-10 17:53:22 UTC
+Finished    2017-07-10 17:55:30 UTC
+Duration    00:02:08
+
+Deployed 'concourse' to 'bosh2'
+bens-mbp-3:bosh-create bbertka$ bosh vms
+Acting as user 'admin' on 'bosh2'
+Deployment 'concourse'
+
+Director task 32
+
+Task 32 done
+----
+
+. Access Concourse Web Interface (https://concourse.yourdomain.com)
+
+== Congratulations you have deployed Concourse CI with your new Bosh Environment!
