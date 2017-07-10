@@ -1,5 +1,7 @@
 = Deploy Concourse
-Now that you have a BOSH running, its time to use it for something useful. This module will help you deploy a Bosh Managed Concourse cluster to AWS.
+Now that you have a secondary BOSH environment running, its time to use it for something useful. This module will help you deploy a Bosh Managed Concourse cluster to AWS.
+
+Please read official Concourse documentation for link:https://concourse.ci/clusters-with-bosh.html[Deploying a Bosh Concourse cluster]
 
 Disclaimer: This repo is not a substitute for a properly designed tool, however could be utilized as a starting point.
 
