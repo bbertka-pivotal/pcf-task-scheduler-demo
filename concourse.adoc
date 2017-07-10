@@ -11,7 +11,6 @@ Disclaimer: This repo is not a substitute for a properly designed tool, however 
 * Concourse BOSH Release and Deployment Manifest
 
 == Generate Concourse SSL Cert and Keys
-We will be accessing the Concourse portal though an AWS load balancer, so will need some keys.
 . Update the included openssl.cnf file with your Route53 Domain names (eg. *.yourdomain.com, *.concourse.yourdomain.com)
 +
 ----
@@ -56,22 +55,10 @@ aws iam get-server-certificate --server-certificate-name concourse-server-certif
 +
 ----
 $ aws iam get-server-certificate --server-certificate-name concourse-server-certificate
-{
-    "ServerCertificate": {
-        "CertificateBody": "-----BEGIN CERTIFICATE-----\nMIIDEjCCAfoCCQDFYXvpOvGahjANBgkqhkiGfCYgMHLP2Nkg==\n-----END CERTIFICATE-----",
-        "ServerCertificateMetadata": {
-            "ServerCertificateId": "AWEDJNGHRUFKDN232342346",
-            "ServerCertificateName": "concourse-server-certificate",
-            "Expiration": "2018-07-10T17:31:00Z",
-            "Path": "/",
-            "Arn": "arn:aws:iam::27046474656:server-certificate/concourse-server-certificate",
-            "UploadDate": "2017-07-10T17:45:51Z"
-        }
-    }
-}
+----
 
 == Create an AWS Load Balancer for Concourse
-. Create Classic Load balancer as "concourse-elb"
+. Create Classic Load balancer as *concourse-elb*
 . Forward following ports
 +
 ----
@@ -79,48 +66,11 @@ $ aws iam get-server-certificate --server-certificate-name concourse-server-cert
 443  -> 4443
 2222 -> 2222
 ----
+
 . Attach your previously uploded *concourse-server-certificate* to the SSL port 443 of _concourse-elb_
 . Create a Route53 entry for *concourse.yourdomain.com* and set CName to DNS of _concourse-elb_
 
 == Update Bosh Cloud Config for Concourse
-. Target your BOSH (within VPC)
-+
-----
-ubuntu@ip-10-0-0-70:~$ bosh target 10.0.0.6
-RSA 1024 bit CA certificates are loaded due to old openssl compatibility
-Target set to 'bosh2'
-----
-+
-----
-ubuntu@ip-10-0-0-70:~$ bosh login
-RSA 1024 bit CA certificates are loaded due to old openssl compatibility
-Your username: admin
-Enter password:
-Logged in as 'admin'
-----
-+
-----
-ubuntu@ip-10-0-0-70:~$ bosh status
-Config
-             /home/ubuntu/.bosh_config
-
-Director
-RSA 1024 bit CA certificates are loaded due to old openssl compatibility
-  Name       bosh2
-  URL        https://10.0.0.6:25555
-  Version    262.3.0 (00000000)
-  User       admin
-  UUID       a904c750-4868-4f85-a1bb-7182842402f3
-  CPI        aws_cpi
-  dns        disabled
-  compiled_package_cache disabled
-  snapshots  disabled
-  config_server disabled
-
-Deployment
-  not set
-----
-
 . Target your original PCF Bosh Director and output Bosh Cloud Config 
 +
 ----
