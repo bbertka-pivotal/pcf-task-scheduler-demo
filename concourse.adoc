@@ -11,7 +11,7 @@ Disclaimer: This repo is not a substitute for a properly designed tool, however 
 * Concourse BOSH Release and Deployment Manifest
 
 == Generate Concourse SSL Cert and Keys
-. Update the included openssl.cnf file with your Route53 Domain names (eg. *.yourdomain.com, *.concourse.yourdomain.com)
+. Update the link:./openssl.cnf[included openssl.cnf] file with your Route53 Domain names (eg. *.yourdomain.com, *.concourse.yourdomain.com)
 +
 ----
 [req]
@@ -187,7 +187,7 @@ Acting as user 'admin' on 'bosh2'
 Releases total: 2
 ----
 
-. Create Concourse Bosh Manifest by updating values in sample Concourse manifest
+. Create Concourse Bosh Manifest by updating values in link:./concourse.yml[Sample Concourse manifest]
 
 . Deploy Concourse
 +
