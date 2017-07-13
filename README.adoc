@@ -1,5 +1,5 @@
-= CF Task Scheduler Demo - Create New BOSH Env
-This repositiory is a demo showing the functionality of CF tasks.  Its intended audience is for an Ops team or anyone with a CF deployment wanting to efficiently deploy multiple BOSH environments.  
+= Ops Lab 1: CF Task Scheduler - Deploy New BOSH
+This repositiory is a lab showing the functionality of CF tasks.  Its intended audience is for an Ops team or anyone with a CF deployment wanting to efficiently deploy multiple BOSH environments.  
 
 Note the architecture of this application is a simple link:https://pypi.python.org/pypi/python-cfworker[Python-CFWorker] server running in CF, with a Shell script used as the task.
 
